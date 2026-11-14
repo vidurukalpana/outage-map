@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-outagemap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-outagemap}
+      POSTGRES_DB: ${POSTGRES_DB:-outagemap}
+      TZ: Asia/Colombo
+      PGTZ: Asia/Colombo
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    configs:
+      - source: create-test-db
+        target: /docker-entrypoint-initdb.d/create-test-db.sql
+
+configs:
+  # Runs only on first start, when the volume is empty.
+  create-test-db:
+    content: |
+      CREATE DATABASE outagemap_test;
+
+volumes:
+  db-data:
