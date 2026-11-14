@@ -1,2 +1,13 @@
+# Local docs
 docs/dev/
 docs/api.md
+
+# Secrets
+.env
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+backend/server
