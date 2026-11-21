@@ -23,6 +23,15 @@ func main() {
 		log.Fatalf("config: %v", err)
 	}
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	pool, err := db.NewPool(ctx, cfg.DatabaseURL, cfg.AppTimezone)
+	if err != nil {
+		log.Fatalf("database: %v", err)
+	}
+	defer pool.Close()
+
 	if err := db.Migrate(cfg.DatabaseURL); err != nil {
 		log.Fatalf("migrate: %v", err)
 	}
@@ -34,9 +43,6 @@ func main() {
 		Addr:    "0.0.0.0:" + cfg.Port,
 		Handler: r,
 	}
-
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
 
 	go func() {
 		log.Printf("listening on %s", srv.Addr)
