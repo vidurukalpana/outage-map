@@ -51,6 +51,7 @@ func main() {
 	r.Get("/health", health)
 	r.Post("/api/reports", reports.Create)
 	r.Get("/api/clusters", reports.Clusters)
+	r.Post("/api/reports/{id}/me-too", reports.MeToo)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:" + cfg.Port,

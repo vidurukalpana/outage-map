@@ -2,8 +2,11 @@ package report
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 
 	"outage-map/backend/internal/httpx"
 )
@@ -58,4 +61,30 @@ func (h *Handler) Clusters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, clusters)
+}
+
+func (h *Handler) MeToo(w http.ResponseWriter, r *http.Request) {
+	deviceID := r.Header.Get("X-Device-Id")
+	if err := ValidateDeviceID(deviceID); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	reportID := chi.URLParam(r, "id")
+	if !uuidPattern.MatchString(reportID) {
+		httpx.WriteError(w, http.StatusNotFound, ErrNotActive.Error())
+		return
+	}
+
+	count, err := h.store.MeToo(r.Context(), reportID, deviceID)
+	switch {
+	case errors.Is(err, ErrNotActive):
+		httpx.WriteError(w, http.StatusNotFound, err.Error())
+	case errors.Is(err, ErrAlreadyVoted):
+		httpx.WriteError(w, http.StatusConflict, err.Error())
+	case err != nil:
+		log.Printf("me too: %v", err)
+		httpx.WriteError(w, http.StatusInternalServerError, "could not add me too")
+	default:
+		httpx.WriteJSON(w, http.StatusOK, map[string]int{"meTooCount": count})
+	}
 }
