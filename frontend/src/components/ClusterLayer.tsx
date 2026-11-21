@@ -5,6 +5,7 @@ import { CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { getClusters } from '../api/client'
 import type { OutageType } from '../api/types'
 import { TYPE_COLOR } from '../lib/outageTypes'
+import ClusterPopup from './ClusterPopup'
 
 // Reports exist only inside Sri Lanka, so the request area is clipped to it.
 const SRI_LANKA = { minLng: 79.5, minLat: 5.8, maxLng: 82.0, maxLat: 10.0 }
@@ -48,6 +49,7 @@ export default function ClusterLayer({ types }: { types: OutageType[] }) {
       <Tooltip permanent direction="center" className="cluster-count">
         {c.reportCount}
       </Tooltip>
+      <ClusterPopup cluster={c} />
     </CircleMarker>
   ))
 }
