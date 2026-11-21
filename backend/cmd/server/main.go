@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -15,6 +14,8 @@ import (
 
 	"outage-map/backend/internal/config"
 	"outage-map/backend/internal/db"
+	"outage-map/backend/internal/httpx"
+	"outage-map/backend/internal/report"
 )
 
 func main() {
@@ -36,8 +37,11 @@ func main() {
 		log.Fatalf("migrate: %v", err)
 	}
 
+	reports := report.NewHandler(report.NewStore(pool))
+
 	r := chi.NewRouter()
 	r.Get("/health", health)
+	r.Post("/api/reports", reports.Create)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:" + cfg.Port,
@@ -63,6 +67,5 @@ func main() {
 
 // health never touches the database so sleeping Neon is not woken by uptime pings.
 func health(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
