@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/go-chi/chi/v5"
 
@@ -23,6 +24,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
+
+	// API timestamps use this zone, since pgx returns times in time.Local.
+	loc, err := time.LoadLocation(cfg.AppTimezone)
+	if err != nil {
+		log.Fatalf("APP_TIMEZONE: %v", err)
+	}
+	time.Local = loc
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -42,6 +50,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Get("/health", health)
 	r.Post("/api/reports", reports.Create)
+	r.Get("/api/clusters", reports.Clusters)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:" + cfg.Port,
