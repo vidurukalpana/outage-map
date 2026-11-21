@@ -32,6 +32,20 @@ export function createReport(req: CreateReportRequest): Promise<CreateReportResp
   })
 }
 
+export function meToo(reportId: string): Promise<{ meTooCount: number }> {
+  return api(`/api/reports/${reportId}/me-too`, {
+    method: 'POST',
+    headers: { 'X-Device-Id': getDeviceId() },
+  })
+}
+
+export function resolveReport(reportId: string): Promise<{ status: string }> {
+  return api(`/api/reports/${reportId}/resolve`, {
+    method: 'POST',
+    headers: { 'X-Device-Id': getDeviceId() },
+  })
+}
+
 export function getClusters(bbox: string, types: OutageType[]): Promise<Cluster[]> {
   const params = new URLSearchParams({ bbox, types: types.join(',') })
   return api(`/api/clusters?${params}`)
