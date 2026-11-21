@@ -12,16 +12,10 @@ var (
 	ErrAlreadyVoted = errors.New("Already added")
 )
 
-func (s *Store) MeToo(ctx context.Context, reportID, deviceID string) (int, error) {
-	tx, err := s.pool.Begin(ctx)
-	if err != nil {
-		return 0, err
-	}
-	defer tx.Rollback(ctx)
-
-	// Lock the row so a parallel resolve cannot slip in before the update.
+// lockActive locks the report row so parallel votes on it run one at a time.
+func lockActive(ctx context.Context, tx pgx.Tx, reportID string) error {
 	var found bool
-	err = tx.QueryRow(ctx, `
+	err := tx.QueryRow(ctx, `
 		SELECT true FROM reports
 		WHERE id = $1
 			AND status = 'active'
@@ -30,9 +24,19 @@ func (s *Store) MeToo(ctx context.Context, reportID, deviceID string) (int, erro
 		reportID,
 	).Scan(&found)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return 0, ErrNotActive
+		return ErrNotActive
 	}
+	return err
+}
+
+func (s *Store) MeToo(ctx context.Context, reportID, deviceID string) (int, error) {
+	tx, err := s.pool.Begin(ctx)
 	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback(ctx)
+
+	if err := lockActive(ctx, tx, reportID); err != nil {
 		return 0, err
 	}
 
@@ -61,4 +65,34 @@ func (s *Store) MeToo(ctx context.Context, reportID, deviceID string) (int, erro
 		return 0, err
 	}
 	return count, tx.Commit(ctx)
+}
+
+func (s *Store) Resolve(ctx context.Context, reportID, deviceID string) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if err := lockActive(ctx, tx, reportID); err != nil {
+		return err
+	}
+
+	if _, err := tx.Exec(ctx, `
+		INSERT INTO report_votes (report_id, device_id, kind)
+		VALUES ($1, $2, 'resolve')`,
+		reportID, deviceID,
+	); err != nil {
+		return err
+	}
+
+	if _, err := tx.Exec(ctx, `
+		UPDATE reports
+		SET status = 'resolved', resolved_at = now()
+		WHERE id = $1`,
+		reportID,
+	); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
