@@ -1,8 +1,14 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import type { OutageType } from '../api/types'
 import OutageMap, { type LatLng } from '../components/OutageMap'
 import ReportForm from '../components/ReportForm'
+import TypeFilter from '../components/TypeFilter'
+import { OUTAGE_TYPES } from '../lib/outageTypes'
 
 export default function LivePage() {
+  const queryClient = useQueryClient()
+  const [types, setTypes] = useState<OutageType[]>(OUTAGE_TYPES.map((t) => t.type))
   const [pin, setPin] = useState<LatLng | null>(null)
   const [message, setMessage] = useState<string | null>(null)
 
@@ -13,8 +19,12 @@ export default function LivePage() {
   }, [message])
 
   return (
-    <main className="h-dvh">
-      <OutageMap pin={pin} onMapClick={setPin} />
+    <main className="flex h-dvh flex-col">
+      <TypeFilter selected={types} onChange={setTypes} />
+
+      <div className="flex-1">
+        <OutageMap types={types} pin={pin} onMapClick={setPin} />
+      </div>
 
       {pin && (
         <ReportForm
@@ -25,6 +35,7 @@ export default function LivePage() {
           onSent={() => {
             setPin(null)
             setMessage('Report sent')
+            queryClient.invalidateQueries({ queryKey: ['clusters'] })
           }}
         />
       )}
@@ -32,7 +43,7 @@ export default function LivePage() {
       {message && (
         <p
           role="status"
-          className="fixed top-4 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-white shadow-lg"
+          className="fixed top-14 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-white shadow-lg"
         >
           {message}
         </p>

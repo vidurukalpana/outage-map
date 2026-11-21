@@ -10,3 +10,20 @@ export interface CreateReportRequest {
 export interface CreateReportResponse {
   id: string
 }
+
+export interface ClusterReport {
+  id: string
+  note: string | null
+  createdAt: string
+  meTooCount: number
+}
+
+export interface Cluster {
+  type: OutageType
+  lat: number
+  lng: number
+  reportCount: number
+  meTooCount: number
+  lastActivityAt: string
+  reports: ClusterReport[]
+}
