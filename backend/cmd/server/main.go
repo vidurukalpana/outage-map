@@ -14,10 +14,18 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"outage-map/backend/internal/config"
+	"outage-map/backend/internal/db"
 )
 
 func main() {
-	cfg := config.Load()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("config: %v", err)
+	}
+
+	if err := db.Migrate(cfg.DatabaseURL); err != nil {
+		log.Fatalf("migrate: %v", err)
+	}
 
 	r := chi.NewRouter()
 	r.Get("/health", health)
