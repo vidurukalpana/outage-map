@@ -6,3 +6,8 @@ export const OUTAGE_TYPES: { type: OutageType; label: string; icon: string; colo
   { type: 'internet', label: 'Internet', icon: '📶', color: '#7C3AED' },
   { type: 'road', label: 'Blocked road', icon: '🚧', color: '#DC2626' },
 ]
+
+export const TYPE_COLOR = Object.fromEntries(OUTAGE_TYPES.map((t) => [t.type, t.color])) as Record<
+  OutageType,
+  string
+>

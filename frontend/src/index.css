@@ -1,1 +1,14 @@
 @import 'tailwindcss';
+
+/* Count label drawn on top of each cluster circle. */
+.leaflet-tooltip.cluster-count {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: white;
+  font-weight: 700;
+}
+
+.leaflet-tooltip.cluster-count::before {
+  display: none;
+}

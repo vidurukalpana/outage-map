@@ -1,5 +1,7 @@
 import 'leaflet/dist/leaflet.css'
 import { CircleMarker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import type { OutageType } from '../api/types'
+import ClusterLayer from './ClusterLayer'
 
 const SRI_LANKA_CENTER: [number, number] = [7.87, 80.77]
 
@@ -9,6 +11,7 @@ export interface LatLng {
 }
 
 interface Props {
+  types: OutageType[]
   pin: LatLng | null
   onMapClick: (point: LatLng) => void
 }
@@ -18,7 +21,7 @@ function ClickHandler({ onMapClick }: Pick<Props, 'onMapClick'>) {
   return null
 }
 
-export default function OutageMap({ pin, onMapClick }: Props) {
+export default function OutageMap({ types, pin, onMapClick }: Props) {
   return (
     <MapContainer center={SRI_LANKA_CENTER} zoom={8} className="h-full w-full">
       <TileLayer
@@ -27,6 +30,7 @@ export default function OutageMap({ pin, onMapClick }: Props) {
         maxZoom={19}
       />
       <ClickHandler onMapClick={onMapClick} />
+      <ClusterLayer types={types} />
       {pin && (
         <CircleMarker
           center={[pin.lat, pin.lng]}
