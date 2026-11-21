@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS report_votes;
+DROP TABLE IF EXISTS reports;
+DROP EXTENSION IF EXISTS postgis;

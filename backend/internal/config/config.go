@@ -1,15 +1,30 @@
 package config
 
-import "os"
+import (
+	"errors"
+	"os"
+)
 
 type Config struct {
-	Port string
+	Port        string
+	DatabaseURL string
+	AppTimezone string
 }
 
-func Load() Config {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+func Load() (Config, error) {
+	cfg := Config{
+		Port:        os.Getenv("PORT"),
+		DatabaseURL: os.Getenv("DATABASE_URL"),
+		AppTimezone: os.Getenv("APP_TIMEZONE"),
 	}
-	return Config{Port: port}
+	if cfg.Port == "" {
+		cfg.Port = "8080"
+	}
+	if cfg.AppTimezone == "" {
+		cfg.AppTimezone = "Asia/Colombo"
+	}
+	if cfg.DatabaseURL == "" {
+		return Config{}, errors.New("DATABASE_URL is required")
+	}
+	return cfg, nil
 }
