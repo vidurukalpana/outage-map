@@ -3,6 +3,8 @@ import type { Cluster, CreateReportRequest, CreateReportResponse, OutageType } f
 
 const baseUrl = import.meta.env.VITE_API_URL
 
+const RATE_LIMIT_MESSAGE = "You've sent a lot of requests. Try again in a few minutes."
+
 export class ApiError extends Error {
   readonly status: number
 
@@ -18,6 +20,9 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   })
   const body = await res.json().catch(() => null)
+  if (res.status === 429) {
+    throw new ApiError(429, RATE_LIMIT_MESSAGE)
+  }
   if (!res.ok) {
     throw new ApiError(res.status, body?.error ?? `Request failed (${res.status})`)
   }

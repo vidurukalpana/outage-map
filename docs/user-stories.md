@@ -50,6 +50,6 @@ As a resident, I want to see which areas had the most outages in the last 7, 30 
 As a resident who sent too many reports or votes in a short time, I want a clear message, so that I know to try again later.
 
 - Limits per IP: 5 reports / 10 min, 20 votes / 10 min, 120 reads / min.
-- Over the limit, the app shows "You've sent a lot of reports. Try again in a few minutes." without crashing.
+- Over the limit, the app shows "You've sent a lot of requests. Try again in a few minutes." without crashing.
 
 All times are shown in Sri Lanka time (`Asia/Colombo`, UTC+05:30).
