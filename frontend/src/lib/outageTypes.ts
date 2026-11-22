@@ -11,3 +11,8 @@ export const TYPE_COLOR = Object.fromEntries(OUTAGE_TYPES.map((t) => [t.type, t.
   OutageType,
   string
 >
+
+export const TYPE_INFO = Object.fromEntries(OUTAGE_TYPES.map((t) => [t.type, t])) as Record<
+  OutageType,
+  (typeof OUTAGE_TYPES)[number]
+>

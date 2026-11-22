@@ -6,6 +6,7 @@ import type {
   HistoryDays,
   HistorySquare,
   OutageType,
+  ResolvedReport,
 } from './types'
 
 const baseUrl = import.meta.env.VITE_API_URL
@@ -67,4 +68,10 @@ export function getHistory(days: HistoryDays, type: OutageType | null): Promise<
   const params = new URLSearchParams({ days: String(days) })
   if (type) params.set('type', type)
   return api(`/api/history?${params}`)
+}
+
+export function getResolved(days: HistoryDays, type: OutageType | null): Promise<ResolvedReport[]> {
+  const params = new URLSearchParams({ days: String(days) })
+  if (type) params.set('type', type)
+  return api(`/api/resolved?${params}`)
 }

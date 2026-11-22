@@ -2,6 +2,7 @@ import { CircleMarker, MapContainer, useMapEvents } from 'react-leaflet'
 import type { OutageType } from '../api/types'
 import { SRI_LANKA_CENTER } from '../lib/sriLanka'
 import ClusterLayer from './ClusterLayer'
+import MapSearch from './MapSearch'
 import OsmTileLayer from './OsmTileLayer'
 
 export interface LatLng {
@@ -24,6 +25,7 @@ export default function OutageMap({ types, pin, onMapClick }: Props) {
   return (
     <MapContainer center={SRI_LANKA_CENTER} zoom={8} className="h-full w-full">
       <OsmTileLayer />
+      <MapSearch />
       <ClickHandler onMapClick={onMapClick} />
       <ClusterLayer types={types} />
       {pin && (

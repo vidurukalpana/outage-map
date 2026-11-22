@@ -52,4 +52,11 @@ As a resident who sent too many reports or votes in a short time, I want a clear
 - Limits per IP: 5 reports / 10 min, 20 votes / 10 min, 120 reads / min.
 - Over the limit, the app shows "You've sent a lot of requests. Try again in a few minutes." without crashing.
 
+## 8. See fixed problems
+
+As a resident, I want to see which problems were fixed recently, so that I know how quickly outages get resolved near me.
+
+- The History page has a Fixed view listing reports marked resolved in the last 7, 30 or 90 days, newest first.
+- Each shows the type, note, when it was reported, when it was fixed, how long the fix took.
+
 All times are shown in Sri Lanka time (`Asia/Colombo`, UTC+05:30).
