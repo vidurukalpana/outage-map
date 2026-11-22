@@ -5,16 +5,15 @@ import { CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { getClusters } from '../api/client'
 import type { OutageType } from '../api/types'
 import { TYPE_COLOR } from '../lib/outageTypes'
+import { SRI_LANKA_BOUNDS } from '../lib/sriLanka'
 import ClusterPopup from './ClusterPopup'
 
 // Reports exist only inside Sri Lanka, so the request area is clipped to it.
-const SRI_LANKA = { minLng: 79.5, minLat: 5.8, maxLng: 82.0, maxLat: 10.0 }
-
 function toBBox(bounds: LatLngBounds): string | null {
-  const minLng = Math.max(bounds.getWest(), SRI_LANKA.minLng)
-  const minLat = Math.max(bounds.getSouth(), SRI_LANKA.minLat)
-  const maxLng = Math.min(bounds.getEast(), SRI_LANKA.maxLng)
-  const maxLat = Math.min(bounds.getNorth(), SRI_LANKA.maxLat)
+  const minLng = Math.max(bounds.getWest(), SRI_LANKA_BOUNDS.minLng)
+  const minLat = Math.max(bounds.getSouth(), SRI_LANKA_BOUNDS.minLat)
+  const maxLng = Math.min(bounds.getEast(), SRI_LANKA_BOUNDS.maxLng)
+  const maxLat = Math.min(bounds.getNorth(), SRI_LANKA_BOUNDS.maxLat)
   if (minLng >= maxLng || minLat >= maxLat) return null
   return [minLng, minLat, maxLng, maxLat].map((v) => v.toFixed(4)).join(',')
 }

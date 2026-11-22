@@ -18,6 +18,16 @@ export interface ClusterReport {
   meTooCount: number
 }
 
+export type HistoryDays = 7 | 30 | 90
+
+export interface HistorySquare {
+  lat: number
+  lng: number
+  count: number
+  countByType: Record<OutageType, number>
+  avgDurationMinutes: number | null
+}
+
 export interface Cluster {
   type: OutageType
   lat: number

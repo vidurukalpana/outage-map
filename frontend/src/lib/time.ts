@@ -20,3 +20,11 @@ export function timeAgo(iso: string, now = Date.now()): string {
   if (hours < 24) return `${hours} h ago`
   return `${Math.floor(hours / 24)} d ago`
 }
+
+// Example: "about 3 h" for an average outage length.
+export function formatDuration(minutes: number): string {
+  if (minutes < 60) return `about ${Math.max(1, Math.round(minutes))} min`
+  const hours = Math.round(minutes / 60)
+  if (hours < 48) return `about ${hours} h`
+  return `about ${Math.round(hours / 24)} d`
+}

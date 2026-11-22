@@ -63,6 +63,23 @@ func (h *Handler) Clusters(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, clusters)
 }
 
+func (h *Handler) History(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	days, typ, err := ParseHistoryQuery(q.Get("days"), q.Get("type"))
+	if err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	squares, err := h.store.History(r.Context(), days, typ)
+	if err != nil {
+		log.Printf("history: %v", err)
+		httpx.WriteError(w, http.StatusInternalServerError, "could not load history")
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, squares)
+}
+
 // voteIDs reads the report ID plus device ID, writing the error response when either is invalid.
 func voteIDs(w http.ResponseWriter, r *http.Request) (reportID, deviceID string, ok bool) {
 	deviceID = r.Header.Get("X-Device-Id")

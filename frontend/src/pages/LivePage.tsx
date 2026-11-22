@@ -19,7 +19,7 @@ export default function LivePage() {
   }, [message])
 
   return (
-    <main className="flex h-dvh flex-col">
+    <main className="flex h-full flex-col">
       <TypeFilter selected={types} onChange={setTypes} />
 
       <div className="flex-1">
@@ -43,7 +43,7 @@ export default function LivePage() {
       {message && (
         <p
           role="status"
-          className="fixed top-14 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-white shadow-lg"
+          className="fixed top-24 left-1/2 z-[1000] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-white shadow-lg"
         >
           {message}
         </p>
