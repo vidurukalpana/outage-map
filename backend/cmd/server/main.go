@@ -56,6 +56,7 @@ func main() {
 	r.Get("/health", health)
 	r.With(createLimit).Post("/api/reports", reports.Create)
 	r.With(readLimit).Get("/api/clusters", reports.Clusters)
+	r.With(readLimit).Get("/api/history", reports.History)
 	r.With(voteLimit).Post("/api/reports/{id}/me-too", reports.MeToo)
 	r.With(voteLimit).Post("/api/reports/{id}/resolve", reports.Resolve)
 
