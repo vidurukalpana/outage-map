@@ -42,5 +42,5 @@ The browser talks to the Go API over HTTPS / JSON; the API runs spatial SQL on P
 | Backend | Go, Chi, pgx, golang-migrate, golang.org/x/time/rate |
 | Database | PostgreSQL + PostGIS |
 | Testing | Go `testing`, Vitest, React Testing Library |
-| DevOps | Docker Compose, GitHub Actions, Dependabot |
+| DevOps | Docker Compose, GitHub Actions |
 | Hosting | Vercel (frontend), Render (API), Neon (database) |
