@@ -28,6 +28,18 @@ export interface HistorySquare {
   avgDurationMinutes: number | null
 }
 
+export interface ResolvedReport {
+  id: string
+  type: OutageType
+  lat: number
+  lng: number
+  note: string | null
+  meTooCount: number
+  createdAt: string
+  resolvedAt: string
+  durationMinutes: number
+}
+
 export interface Cluster {
   type: OutageType
   lat: number

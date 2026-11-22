@@ -3,10 +3,13 @@ import type { LatLngBounds } from 'leaflet'
 import { useState } from 'react'
 import { CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { getClusters } from '../api/client'
-import type { OutageType } from '../api/types'
+import type { Cluster, OutageType } from '../api/types'
 import { TYPE_COLOR } from '../lib/outageTypes'
 import { SRI_LANKA_BOUNDS } from '../lib/sriLanka'
+import { useSpreadPositions } from '../lib/useSpreadPositions'
 import ClusterPopup from './ClusterPopup'
+
+const NO_CLUSTERS: Cluster[] = []
 
 // Reports exist only inside Sri Lanka, so the request area is clipped to it.
 function toBBox(bounds: LatLngBounds): string | null {
@@ -27,20 +30,21 @@ export default function ClusterLayer({ types }: { types: OutageType[] }) {
   const [bbox, setBBox] = useState(() => toBBox(map.getBounds()))
   useMapEvents({ moveend: () => setBBox(toBBox(map.getBounds())) })
 
-  const { data } = useQuery({
+  const { data = NO_CLUSTERS } = useQuery({
     queryKey: ['clusters', bbox, types],
     queryFn: () => getClusters(bbox!, types),
     enabled: bbox !== null && types.length > 0,
     refetchInterval: 30_000,
     placeholderData: keepPreviousData,
   })
+  const positions = useSpreadPositions(data)
 
   if (!bbox || types.length === 0) return null
 
-  return data?.map((c) => (
+  return data.map((c, i) => (
     <CircleMarker
       key={`${c.type}-${c.reports[0].id}`}
-      center={[c.lat, c.lng]}
+      center={positions[i]}
       radius={radius(c.reportCount)}
       bubblingMouseEvents={false}
       pathOptions={{ color: 'white', weight: 2, fillColor: TYPE_COLOR[c.type], fillOpacity: 0.85 }}

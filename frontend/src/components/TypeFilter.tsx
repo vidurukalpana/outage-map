@@ -6,27 +6,40 @@ interface Props {
   onChange: (types: OutageType[]) => void
 }
 
-// Each checkbox carries its type colour, so the filter doubles as the map legend.
+// Each chip carries its type colour, so the filter doubles as the map legend.
 export default function TypeFilter({ selected, onChange }: Props) {
   function toggle(type: OutageType) {
     onChange(selected.includes(type) ? selected.filter((t) => t !== type) : [...selected, type])
   }
 
   return (
-    <fieldset className="flex flex-wrap gap-x-4 gap-y-1 bg-white px-3 py-2 text-sm shadow">
-      <legend className="sr-only">Outage types</legend>
-      {OUTAGE_TYPES.map((t) => (
-        <label key={t.type} className="flex items-center gap-1.5">
-          <input
-            type="checkbox"
-            checked={selected.includes(t.type)}
-            onChange={() => toggle(t.type)}
-            style={{ accentColor: t.color }}
-          />
-          <span className="inline-block size-3 rounded-full" style={{ backgroundColor: t.color }} />
-          {t.label}
-        </label>
-      ))}
-    </fieldset>
+    <div className="space-y-1.5 border-b border-gray-200 bg-white px-3 py-2">
+      <div className="flex flex-wrap gap-1.5" role="group" aria-label="Show outage types">
+        {OUTAGE_TYPES.map((t) => {
+          const on = selected.includes(t.type)
+          return (
+            <button
+              key={t.type}
+              type="button"
+              onClick={() => toggle(t.type)}
+              aria-pressed={on}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition ${
+                on ? '' : 'border-gray-200 bg-gray-50 text-gray-400'
+              }`}
+              style={on ? { color: t.color, borderColor: t.color, backgroundColor: `${t.color}14` } : undefined}
+            >
+              <span className={on ? '' : 'opacity-40 grayscale'} aria-hidden="true">
+                {t.icon}
+              </span>
+              {t.label}
+            </button>
+          )
+        })}
+      </div>
+      <p className="text-xs text-gray-500">
+        Tap a type to show or hide it. Tap anywhere on the map to report a problem; tap a circle to see reports or
+        add "me too".
+      </p>
+    </div>
   )
 }

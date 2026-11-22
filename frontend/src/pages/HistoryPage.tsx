@@ -1,122 +1,114 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { Map as LeafletMap } from 'leaflet'
 import { useState } from 'react'
-import { CircleMarker, MapContainer, Tooltip } from 'react-leaflet'
-import { getHistory } from '../api/client'
-import type { HistoryDays, HistorySquare, OutageType } from '../api/types'
+import { MapContainer } from 'react-leaflet'
+import { useSearchParams } from 'react-router'
+import { getHistory, getResolved } from '../api/client'
+import type { HistoryDays, HistorySquare, OutageType, ResolvedReport } from '../api/types'
+import { FixedList, FixedMarkers } from '../components/FixedReports'
+import { AreaList, AreaMarkers } from '../components/HistoryAreas'
+import MapSearch from '../components/MapSearch'
 import OsmTileLayer from '../components/OsmTileLayer'
-import { OUTAGE_TYPES } from '../lib/outageTypes'
+import PeriodTypeFilter from '../components/PeriodTypeFilter'
 import { SRI_LANKA_CENTER } from '../lib/sriLanka'
-import { formatDuration } from '../lib/time'
 
-const PERIODS: HistoryDays[] = [7, 30, 90]
+const NO_SQUARES: HistorySquare[] = []
+const NO_REPORTS: ResolvedReport[] = []
 
-function mainType(square: HistorySquare) {
-  return OUTAGE_TYPES.reduce((best, t) =>
-    square.countByType[t.type] > square.countByType[best.type] ? t : best,
-  )
-}
-
-function radius(count: number): number {
-  return Math.min(6 + Math.sqrt(count) * 3, 30)
-}
+const VIEWS = [
+  { id: 'areas', label: 'Busiest areas' },
+  { id: 'fixed', label: 'Fixed' },
+] as const
 
 export default function HistoryPage() {
+  const [params, setParams] = useSearchParams()
+  const view = params.get('view') === 'fixed' ? 'fixed' : 'areas'
   const [days, setDays] = useState<HistoryDays>(30)
   const [type, setType] = useState<OutageType | null>(null)
   const [map, setMap] = useState<LeafletMap | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
 
-  const { data = [], isPending, isError } = useQuery({
+  const areas = useQuery({
     queryKey: ['history', days, type],
     queryFn: () => getHistory(days, type),
+    enabled: view === 'areas',
     placeholderData: keepPreviousData,
   })
+  const fixed = useQuery({
+    queryKey: ['resolved', days, type],
+    queryFn: () => getResolved(days, type),
+    enabled: view === 'fixed',
+    placeholderData: keepPreviousData,
+  })
+  const active = view === 'areas' ? areas : fixed
+  const squares = areas.data ?? NO_SQUARES
+  const reports = fixed.data ?? NO_REPORTS
+  const isEmpty = view === 'areas' ? squares.length === 0 : reports.length === 0
+
+  function showView(id: (typeof VIEWS)[number]['id']) {
+    setSelected(null)
+    setParams(id === 'fixed' ? { view: 'fixed' } : {})
+  }
+
+  function zoomTo(key: string, lat: number, lng: number) {
+    setSelected(key)
+    map?.flyTo([lat, lng], 15)
+  }
 
   return (
-    <main className="h-full overflow-y-auto">
-      <div className="flex flex-wrap items-center gap-2 bg-white px-3 py-2 shadow">
-        <div className="flex gap-1">
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setDays(p)}
-              aria-pressed={days === p}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                days === p ? 'bg-gray-900 text-white' : 'border border-gray-300 text-gray-700'
-              }`}
-            >
-              {p} days
-            </button>
-          ))}
-        </div>
-        <select
-          value={type ?? ''}
-          onChange={(e) => setType((e.target.value || null) as OutageType | null)}
-          aria-label="Outage type"
-          className="rounded-lg border border-gray-300 px-2 py-1.5 text-sm"
-        >
-          <option value="">All types</option>
-          {OUTAGE_TYPES.map((t) => (
-            <option key={t.type} value={t.type}>
-              {t.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="h-[50dvh]">
-        <MapContainer center={SRI_LANKA_CENTER} zoom={7} ref={setMap} className="h-full w-full">
+    <main className="flex h-full flex-col md:flex-row">
+      <div className="h-[45dvh] shrink-0 md:h-full md:flex-1">
+        <MapContainer center={SRI_LANKA_CENTER} zoom={8} ref={setMap} className="h-full w-full">
           <OsmTileLayer />
-          {data.map((s) => (
-            <CircleMarker
-              key={`${s.lat},${s.lng}`}
-              center={[s.lat, s.lng]}
-              radius={radius(s.count)}
-              pathOptions={{ color: 'white', weight: 2, fillColor: mainType(s).color, fillOpacity: 0.8 }}
-            >
-              <Tooltip>
-                {s.count} {s.count === 1 ? 'report' : 'reports'}
-              </Tooltip>
-            </CircleMarker>
-          ))}
+          <MapSearch />
+          {view === 'areas' ? (
+            <AreaMarkers squares={squares} selected={selected} onSelect={zoomTo} />
+          ) : (
+            <FixedMarkers reports={reports} selected={selected} onSelect={zoomTo} />
+          )}
         </MapContainer>
       </div>
 
-      <section className="mx-auto max-w-2xl p-3">
-        <h2 className="mb-2 font-semibold">Busiest areas · last {days} days</h2>
-        {isPending && <p className="text-sm text-gray-500">Loading…</p>}
-        {isError && <p className="text-sm text-red-600">Could not load history.</p>}
-        {!isPending && !isError && data.length === 0 && (
-          <p className="text-sm text-gray-500">No reports in this period.</p>
+      <aside className="min-h-0 flex-1 space-y-4 overflow-y-auto border-gray-200 bg-white p-4 md:w-[26rem] md:flex-none md:border-l">
+        <div className="grid grid-cols-2 gap-1 rounded-xl bg-gray-100 p-1" role="tablist">
+          {VIEWS.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              role="tab"
+              aria-selected={view === v.id}
+              onClick={() => showView(v.id)}
+              className={`rounded-lg py-1.5 text-sm font-medium ${
+                view === v.id ? 'bg-white text-gray-900 shadow' : 'text-gray-600'
+              }`}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+
+        <PeriodTypeFilter days={days} type={type} onDaysChange={setDays} onTypeChange={setType} />
+
+        {active.isPending && <p className="text-sm text-gray-500">Loading…</p>}
+        {active.isError && <p className="text-sm text-red-600">Could not load history.</p>}
+        {active.isSuccess && isEmpty && (
+          <p className="text-sm text-gray-500">
+            {view === 'areas' ? 'No reports in this period.' : 'Nothing was marked fixed in this period.'}
+          </p>
         )}
-        <ol className="divide-y divide-gray-100">
-          {data.slice(0, 10).map((s, i) => {
-            const main = mainType(s)
-            return (
-              <li key={`${s.lat},${s.lng}`}>
-                <button
-                  type="button"
-                  onClick={() => map?.flyTo([s.lat, s.lng], 15)}
-                  className="flex w-full items-center gap-3 py-2 text-left"
-                >
-                  <span className="w-5 text-sm text-gray-400">{i + 1}</span>
-                  <span className="inline-block size-3 rounded-full" style={{ backgroundColor: main.color }} />
-                  <span className="flex-1">
-                    <span className="font-medium">
-                      {s.count} {s.count === 1 ? 'report' : 'reports'}
-                    </span>
-                    <span className="text-gray-500"> · mostly {main.label.toLowerCase()}</span>
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {s.avgDurationMinutes === null ? 'no resolves yet' : formatDuration(s.avgDurationMinutes)}
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ol>
-      </section>
+
+        {view === 'areas' && squares.length > 0 && (
+          <AreaList
+            squares={squares}
+            days={days}
+            selected={selected}
+            onSelect={zoomTo}
+          />
+        )}
+        {view === 'fixed' && reports.length > 0 && (
+          <FixedList reports={reports} days={days} selected={selected} onSelect={zoomTo} />
+        )}
+      </aside>
     </main>
   )
 }

@@ -80,6 +80,23 @@ func (h *Handler) History(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, squares)
 }
 
+func (h *Handler) Resolved(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	days, typ, err := ParseHistoryQuery(q.Get("days"), q.Get("type"))
+	if err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	reports, err := h.store.Resolved(r.Context(), days, typ)
+	if err != nil {
+		log.Printf("resolved: %v", err)
+		httpx.WriteError(w, http.StatusInternalServerError, "could not load fixed reports")
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, reports)
+}
+
 // voteIDs reads the report ID plus device ID, writing the error response when either is invalid.
 func voteIDs(w http.ResponseWriter, r *http.Request) (reportID, deviceID string, ok bool) {
 	deviceID = r.Header.Get("X-Device-Id")
