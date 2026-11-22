@@ -16,6 +16,7 @@ import (
 	"outage-map/backend/internal/config"
 	"outage-map/backend/internal/db"
 	"outage-map/backend/internal/httpx"
+	"outage-map/backend/internal/ratelimit"
 	"outage-map/backend/internal/report"
 )
 
@@ -47,12 +48,16 @@ func main() {
 
 	reports := report.NewHandler(report.NewStore(pool))
 
+	createLimit := ratelimit.New(ctx, ratelimit.Create, cfg.TrustProxy).Middleware
+	voteLimit := ratelimit.New(ctx, ratelimit.Votes, cfg.TrustProxy).Middleware
+	readLimit := ratelimit.New(ctx, ratelimit.Reads, cfg.TrustProxy).Middleware
+
 	r := chi.NewRouter()
 	r.Get("/health", health)
-	r.Post("/api/reports", reports.Create)
-	r.Get("/api/clusters", reports.Clusters)
-	r.Post("/api/reports/{id}/me-too", reports.MeToo)
-	r.Post("/api/reports/{id}/resolve", reports.Resolve)
+	r.With(createLimit).Post("/api/reports", reports.Create)
+	r.With(readLimit).Get("/api/clusters", reports.Clusters)
+	r.With(voteLimit).Post("/api/reports/{id}/me-too", reports.MeToo)
+	r.With(voteLimit).Post("/api/reports/{id}/resolve", reports.Resolve)
 
 	srv := &http.Server{
 		Addr:    "0.0.0.0:" + cfg.Port,
