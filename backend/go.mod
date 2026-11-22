@@ -4,6 +4,7 @@ go 1.27.3
 
 require (
 	github.com/go-chi/chi/v5 v5.5.0
+	github.com/go-chi/cors v1.2.2
 	github.com/golang-migrate/migrate/v4 v4.20.1
 	github.com/jackc/pgx/v5 v5.13.0
 	golang.org/x/time v0.16.0
