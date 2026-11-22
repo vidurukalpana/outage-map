@@ -1,7 +1,6 @@
 package report
 
 import (
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -21,8 +20,7 @@ func NewHandler(store *Store) *Handler {
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var req CreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		httpx.WriteError(w, http.StatusBadRequest, "invalid JSON body")
+	if !httpx.DecodeJSON(w, r, &req) {
 		return
 	}
 

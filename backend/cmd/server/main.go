@@ -60,6 +60,7 @@ func main() {
 		AllowedHeaders: []string{"Content-Type", "X-Device-Id"},
 		MaxAge:         300,
 	}))
+	r.Use(httpx.SecurityHeaders, httpx.LimitBody)
 	r.Get("/health", health)
 	r.With(createLimit).Post("/api/reports", reports.Create)
 	r.With(readLimit).Get("/api/clusters", reports.Clusters)
@@ -69,8 +70,11 @@ func main() {
 	r.With(voteLimit).Post("/api/reports/{id}/resolve", reports.Resolve)
 
 	srv := &http.Server{
-		Addr:    "0.0.0.0:" + cfg.Port,
-		Handler: r,
+		Addr:         "0.0.0.0:" + cfg.Port,
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	go func() {
