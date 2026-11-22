@@ -1,5 +1,12 @@
 import { getDeviceId } from '../lib/device'
-import type { Cluster, CreateReportRequest, CreateReportResponse, OutageType } from './types'
+import type {
+  Cluster,
+  CreateReportRequest,
+  CreateReportResponse,
+  HistoryDays,
+  HistorySquare,
+  OutageType,
+} from './types'
 
 const baseUrl = import.meta.env.VITE_API_URL
 
@@ -54,4 +61,10 @@ export function resolveReport(reportId: string): Promise<{ status: string }> {
 export function getClusters(bbox: string, types: OutageType[]): Promise<Cluster[]> {
   const params = new URLSearchParams({ bbox, types: types.join(',') })
   return api(`/api/clusters?${params}`)
+}
+
+export function getHistory(days: HistoryDays, type: OutageType | null): Promise<HistorySquare[]> {
+  const params = new URLSearchParams({ days: String(days) })
+  if (type) params.set('type', type)
+  return api(`/api/history?${params}`)
 }
