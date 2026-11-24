@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OutageMap</title>
+    <meta
+      name="description"
+      content="A community map for reporting power, water, internet outages and blocked roads in Sri Lanka."
+    />
+    <meta name="theme-color" content="#111827" />
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=DM+Serif+Display&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top">
+          <img src="assets/logo.svg" alt="" width="32" height="32" />
+          <span>OutageMap</span>
+        </a>
+        <nav aria-label="Sections">
+          <a href="#problem">Problem</a>
+          <a href="#solution">Solution</a>
+          <a href="#tour">App Tour</a>
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#data-flow">Data Flow</a>
+          <a href="#tech-stack">Tech Stack</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="top" class="hero">
+        <div class="container hero-inner">
+          <div class="hero-text">
+            <h1>Is It Just Me, <span>or the Whole Area?</span></h1>
+            <p class="intro">
+              A community map for reporting power, water and internet outages and blocked roads in
+              Sri Lanka. Anyone can drop a pin to report a problem, see whether neighbours have the
+              same problem, add a "me too" or mark it resolved. No login and no exact home location
+              stored.
+            </p>
+            <a class="button" href="https://github.com/vidurukalpana/outage-map">View on GitHub</a>
+          </div>
+          <figure class="screens hero-screens">
+            <div class="browser"><img src="assets/screens/live-desktop.webp" alt="Live outage map of Colombo on desktop" width="2560" height="1600" fetchpriority="high" /></div>
+            <div class="phone"><img src="assets/screens/popup-phone.webp" alt="Report details with Me too and Resolved buttons on mobile" width="780" height="1688" /></div>
+          </figure>
+        </div>
+      </section>
+
+      <section id="problem" class="section">
+        <div class="container">
+          <h2>Problem</h2>
+          <p class="intro">
+            When the power, water or internet goes out or a road is blocked, people are left
+            guessing and calling each other to find out what is happening.
+          </p>
+          <ul class="points">
+            <li>Nobody knows whether the outage is just their house or the whole area.</li>
+            <li>Nobody knows when it will come back.</li>
+            <li>There is no simple shared place to see outages nearby.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="solution" class="section section-tint">
+        <div class="container">
+          <h2>Solution</h2>
+          <p class="intro">
+            OutageMap turns single reports into a shared live picture. Nearby reports of the same
+            type are grouped, neighbours confirm them with one tap and a history map shows which
+            areas lose service most often.
+          </p>
+          <ol class="steps">
+            <li><span>1</span>Tap the map, choose the type and add an optional short note.</li>
+            <li><span>2</span>See reports of the same type within 500 m grouped into one circle.</li>
+            <li><span>3</span>Add "me too" to a report, or mark it resolved when service is back.</li>
+            <li><span>4</span>Review the busiest areas and fixed problems over 7, 30 or 90 days.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="tour" class="section">
+        <div class="container">
+          <h2>App Tour</h2>
+          <p class="intro">
+            The main screens of the web app. Every screen is designed for both desktop and mobile.
+          </p>
+
+          <div class="tabs" role="tablist" aria-label="App screens">
+            <button role="tab" id="tab-live" aria-controls="panel-live" aria-selected="true">Live map</button>
+            <button role="tab" id="tab-report" aria-controls="panel-report" aria-selected="false">Report</button>
+            <button role="tab" id="tab-popup" aria-controls="panel-popup" aria-selected="false">Me too</button>
+            <button role="tab" id="tab-history" aria-controls="panel-history" aria-selected="false">Busiest areas</button>
+            <button role="tab" id="tab-fixed" aria-controls="panel-fixed" aria-selected="false">Fixed</button>
+          </div>
+
+          <div class="panel" role="tabpanel" id="panel-live" aria-labelledby="tab-live">
+            <figure class="screens">
+              <div class="browser"><img src="assets/screens/live-desktop.webp" alt="Live map on desktop" width="2560" height="1600" loading="lazy" /></div>
+              <div class="phone"><img src="assets/screens/live-phone.webp" alt="Live map on mobile" width="780" height="1688" loading="lazy" /></div>
+            </figure>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-report" aria-labelledby="tab-report">
+            <figure class="screens">
+              <div class="browser"><img src="assets/screens/report-desktop.webp" alt="Report form on desktop" width="2560" height="1600" loading="lazy" /></div>
+              <div class="phone"><img src="assets/screens/report-phone.webp" alt="Report form on mobile" width="780" height="1688" loading="lazy" /></div>
+            </figure>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-popup" aria-labelledby="tab-popup">
+            <figure class="screens">
+              <div class="browser"><img src="assets/screens/popup-desktop.webp" alt="Grouped reports with Me too and Resolved on desktop" width="2560" height="1600" loading="lazy" /></div>
+              <div class="phone"><img src="assets/screens/popup-phone.webp" alt="Grouped reports with Me too and Resolved on mobile" width="780" height="1688" loading="lazy" /></div>
+            </figure>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-history" aria-labelledby="tab-history">
+            <figure class="screens">
+              <div class="browser"><img src="assets/screens/history-desktop.webp" alt="Busiest areas history on desktop" width="2560" height="1600" loading="lazy" /></div>
+              <div class="phone"><img src="assets/screens/history-phone.webp" alt="Busiest areas history on mobile" width="780" height="1688" loading="lazy" /></div>
+            </figure>
+          </div>
+          <div class="panel" role="tabpanel" id="panel-fixed" aria-labelledby="tab-fixed">
+            <figure class="screens">
+              <div class="browser"><img src="assets/screens/fixed-desktop.webp" alt="Fixed problems on desktop" width="2560" height="1600" loading="lazy" /></div>
+              <div class="phone"><img src="assets/screens/fixed-phone.webp" alt="Fixed problems on mobile" width="780" height="1688" loading="lazy" /></div>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="section section-tint">
+        <div class="container">
+          <h2>Features</h2>
+          <p class="intro">
+            A small set of features that follows an outage from the first report to the moment it
+            is fixed.
+          </p>
+          <ul class="cards">
+            <li class="card">
+              <h3>Report in seconds</h3>
+              <p>
+                Tap the map, choose
+                <b class="tag tag-power">Power</b> <b class="tag tag-water">Water</b>
+                <b class="tag tag-internet">Internet</b> or <b class="tag tag-road">Blocked road</b>
+                and add an optional note of up to 140 characters.
+              </p>
+            </li>
+            <li class="card">
+              <h3>Grouped reports</h3>
+              <p>Reports of the same type within 500 m become one circle that shows the count.</p>
+            </li>
+            <li class="card">
+              <h3>Me too and Resolved</h3>
+              <p>One "me too" per device per report. A resolved report leaves the live map at once.</p>
+            </li>
+            <li class="card">
+              <h3>Busiest areas</h3>
+              <p>1 km squares with the most reports in 7, 30 or 90 days, with the typical outage length.</p>
+            </li>
+            <li class="card">
+              <h3>Fixed problems</h3>
+              <p>A list of resolved reports with when each was reported, fixed and how long it took.</p>
+            </li>
+            <li class="card">
+              <h3>Private and safe</h3>
+              <p>No login, no IP stored, pins rounded to about 100 m and a rate limit per IP.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="architecture" class="section">
+        <div class="container">
+          <h2>Architecture</h2>
+          <p class="intro">
+            A three-tier web application. A React single-page app calls a Go REST API over HTTPS.
+            The API runs spatial SQL on PostgreSQL with PostGIS. Map images load directly from
+            OpenStreetMap.
+          </p>
+
+          <div class="arch" role="img" aria-label="Architecture: React frontend on Vercel calls the Go API on Render over HTTPS with JSON. The API runs spatial SQL on PostgreSQL with PostGIS on Neon. Map tiles come from OpenStreetMap.">
+            <div class="tier">
+              <h3>Frontend <small>Vercel</small></h3>
+              <div class="box box-strong">React SPA<br /><small>TypeScript - Vite</small></div>
+              <div class="box">Live map - History</div>
+              <div class="box">Leaflet - OpenStreetMap tiles</div>
+              <div class="box">TanStack Query - 30 s refresh</div>
+            </div>
+
+            <div class="link"><span>HTTPS - JSON</span></div>
+
+            <div class="tier">
+              <h3>Backend <small>Render</small></h3>
+              <div class="box box-strong">Go API<br /><small>Chi router</small></div>
+              <div class="box">CORS - body limit 4 KB</div>
+              <div class="box">Rate limiter per IP</div>
+              <div class="box">Reports - Clusters - History</div>
+              <div class="box">Migrations at startup</div>
+            </div>
+
+            <div class="link"><span>Spatial SQL</span></div>
+
+            <div class="tier">
+              <h3>Data</h3>
+              <div class="box box-strong">PostgreSQL + PostGIS<br /><small>Neon - reports, votes</small></div>
+              <div class="box">GiST index on location</div>
+              <div class="box">ST_ClusterDBSCAN - ST_SnapToGrid</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="data-flow" class="section section-tint">
+        <div class="container">
+          <h2>Data Flow</h2>
+          <p class="intro">
+            Three flows show how data moves through the system: reporting an outage, seeing grouped
+            outages and the history map.
+          </p>
+
+          <div class="flows">
+            <article class="flow">
+              <h3>Report an outage</h3>
+              <ol>
+                <li>The user taps the map and a form opens at that point.</li>
+                <li><code>POST /api/reports</code> is sent with the type, location and an anonymous device ID.</li>
+                <li>The API checks the rate limit and validates the input.</li>
+                <li>The location is rounded to about 100 m and saved in PostGIS.</li>
+              </ol>
+            </article>
+            <article class="flow">
+              <h3>See grouped outages</h3>
+              <ol>
+                <li>The map sends its visible area every 30 seconds.</li>
+                <li><code>GET /api/clusters?bbox=…</code> reads active reports in that area.</li>
+                <li>PostGIS groups them per type within 500 m with <code>ST_ClusterDBSCAN</code>.</li>
+                <li>The map draws one coloured circle per group with its count.</li>
+              </ol>
+            </article>
+            <article class="flow">
+              <h3>History</h3>
+              <ol>
+                <li>The user picks 7, 30 or 90 days and an optional type.</li>
+                <li><code>GET /api/history?days=30</code> is sent.</li>
+                <li>PostGIS groups reports into 1 km squares with <code>ST_SnapToGrid</code>.</li>
+                <li>The page shows the busiest squares with counts and typical outage length.</li>
+              </ol>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="tech-stack" class="section">
+        <div class="container">
+          <h2>Tech Stack</h2>
+          <p class="intro">Open-source tools with free hosting tiers.</p>
+          <dl class="stack">
+            <div>
+              <dt>Frontend</dt>
+              <dd><span>React</span><span>TypeScript</span><span>Vite</span><span>Leaflet</span><span>react-leaflet</span><span>OpenStreetMap</span><span>TanStack Query</span><span>React Router</span><span>Tailwind CSS</span></dd>
+            </div>
+            <div>
+              <dt>Backend</dt>
+              <dd><span>Go</span><span>Chi</span><span>pgx</span><span>golang-migrate</span><span>x/time/rate</span></dd>
+            </div>
+            <div>
+              <dt>Database</dt>
+              <dd><span>PostgreSQL</span><span>PostGIS</span></dd>
+            </div>
+            <div>
+              <dt>Testing</dt>
+              <dd><span>Go testing</span><span>Vitest</span><span>React Testing Library</span></dd>
+            </div>
+            <div>
+              <dt>DevOps</dt>
+              <dd><span>Git</span><span>GitHub</span><span>Docker Compose</span><span>GitHub Actions</span></dd>
+            </div>
+            <div>
+              <dt>Hosting</dt>
+              <dd><span>Vercel</span><span>Render</span><span>Neon</span><span>GitHub Pages</span></dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        OutageMap
+        <small>Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</small>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
