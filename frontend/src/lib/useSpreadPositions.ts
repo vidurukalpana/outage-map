@@ -23,7 +23,8 @@ function spread(map: LeafletMap, zoom: number, items: Point[]): [number, number]
   for (const group of groups) {
     if (group.length < 2) continue
     const centre = points[group[0]]
-    const ring = 14 + 4 * group.length
+    // Capped so a busy spot stays a small ring instead of spreading across the map.
+    const ring = Math.min(14 + 4 * group.length, 40)
     group.forEach((index, k) => {
       const angle = (2 * Math.PI * k) / group.length - Math.PI / 2
       const ll = map.unproject(centre.add([ring * Math.cos(angle), ring * Math.sin(angle)]), zoom)
